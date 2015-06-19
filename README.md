@@ -18,7 +18,7 @@ pacman -U *.tar.xz
 
 ```
 make
-cp  libautojoin.so /usr/lib/mcabber/
+cp libautojoin.so /usr/lib/mcabber/
 ```
 
 ## Usage
