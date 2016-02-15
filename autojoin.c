@@ -33,12 +33,21 @@ static guint autojoin_on_connect(const gchar *hook, hk_arg_t *args, gpointer dat
 
     scr_log_print(LPRINT_NORMAL, "autojoin: connected");
 
-    char *mucs = (char *) settings_get(SETTINGS_TYPE_OPTION, "autojoin");
-    if (!mucs) {
+    const char *mucs_option = (const char *) settings_get(
+        SETTINGS_TYPE_OPTION,
+        "autojoin"
+    );
+    if (!mucs_option) {
         return HOOK_HANDLER_RESULT_ALLOW_MORE_HANDLERS;
     }
 
-    const char* muc_name = strtok(mucs, ",");
+    char *mucs = strdup(mucs_option);
+    if (!mucs) {
+        scr_log_print(LPRINT_NORMAL, "autojoin: out of memory");
+        return HOOK_HANDLER_RESULT_ALLOW_MORE_HANDLERS;
+    }
+
+    char* muc_name = strtok(mucs, ",");
 
     char* server_name;
 
@@ -69,6 +78,8 @@ static guint autojoin_on_connect(const gchar *hook, hk_arg_t *args, gpointer dat
 
         xmpp_room_join(full_muc_name, default_muc_nickname(muc_name), "");
     } while ((muc_name = strtok(NULL, ",")) != NULL);
+
+    free(mucs);
 
     return HOOK_HANDLER_RESULT_ALLOW_MORE_HANDLERS;
 }
